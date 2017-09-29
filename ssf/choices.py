@@ -1,3 +1,5 @@
+# chairperson, president, sntsecy, cultsecy, sportssecy
+
 PROGRAMME = (
     ('B.Tech', 'B.Tech'),
     ('B.S', 'B.S'),
@@ -54,8 +56,8 @@ SESSION = (
 )
 
 COUNCIL = (
-    ('Science & Technology Council', 'SnT Council'),
-    ('Films and Cultural Council', 'Films and Cult Council'),
+    ('Science & Technology Council', 'Science & Technology Council'),
+    ('Films and Cultural Council', 'Films and Cultural Council'),
     ('Sports Council', 'Sports Council'),
     ('President Student Gymkhana', 'President Student Gymkhana'),
     ("Chairperson Students' Senate", "Chairperson Students' Senate"),

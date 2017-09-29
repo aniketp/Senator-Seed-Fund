@@ -5,4 +5,27 @@
     <div>
         <h2><a href="{% url 'ssf_create' %}">Create a New SSF</a></h2>
     </div>
+
+    <br>
+
+    <div>
+        <h2>Forms Created by You</h2>
+
+
+            {% for ssl in ssf_forms %}
+                <div class="container">
+                    <div class="row">
+                        <p>Name: {{ ssl.activity_name }}</p>
+                        <p>Status: {{ ssl.status }}</p>
+                        <div>
+                            <form action="{% url 'ssf_update' ssl.pk %}" method="get">
+                                <div>
+                                    <input type="submit" value="Submit">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+    </div>
 {% endblock %}
