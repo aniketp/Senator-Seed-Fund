@@ -7,7 +7,7 @@ class GBMAdmin(admin.ModelAdmin):
 
 
 class SSFAdmin(admin.ModelAdmin):
-    list_display = ('activity_name', 'ssf', 'council', 'entity')
+    list_display = ('activity_name', 'created_by', 'ssf', 'council', 'entity')
 
 
 class AdminPostAdmin(admin.ModelAdmin):

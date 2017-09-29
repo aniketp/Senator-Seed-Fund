@@ -1,0 +1,115 @@
+#brand{
+    text-decoration: none;
+    font-size: large;
+    font-weight: bold;
+    margin-right: 30px;
+}
+
+#navbar-links{
+    font-size: large;
+}
+
+#navbar{
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+}
+
+body {
+    background: #ffffff;
+}
+
+/* Profile container */
+.profile {
+    margin: 20px 0;
+}
+
+/* Profile sidebar */
+.profile-sidebar {
+    padding: 20px 0 10px 0;
+    width: 300px;
+    margin-top: 50px;
+}
+
+.profile-userpic img {
+    float: none;
+    margin: 0 auto;
+    width: 50%;
+    height: 50%;
+}
+
+.profile-usertitle {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.profile-usertitle-name {
+    color: #5a7391;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.profile-usertitle-job {
+    text-transform: uppercase;
+    color: #5b9bd1;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.profile-userbuttons {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.profile-userbuttons .btn {
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 15px;
+    margin-right: 5px;
+}
+
+.profile-userbuttons .btn:last-child {
+    margin-right: 0;
+}
+
+.profile-usermenu {
+    margin-top: 30px;
+}
+
+.profile-usermenu table thead tr th {
+    text-align: center;
+}
+
+.profile-usermenu table tbody tr td {
+    text-align: center;
+}
+
+#topic {
+    font-weight: bolder;
+}
+
+/* Profile Content */
+.profile-content {
+    z-index: 0;
+    margin-top: 32px;
+    padding: 20px;
+    background: #ffffff;
+    min-height: 460px;
+}
+
+@media screen and (max-width: 600px) {
+  #profile {
+    visibility: hidden;
+    clear: both;
+    float: left;
+    margin: 10px auto 5px 20px;
+    width: 28%;
+    display: none;
+  }
+}
+.tooltip-layout {
+    text-align: right;
+}

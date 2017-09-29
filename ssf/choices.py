@@ -61,3 +61,8 @@ COUNCIL = (
     ("Chairperson Students' Senate", "Chairperson Students' Senate"),
 )
 
+FORM_STATUS = (
+    ('in progress', 'in progress'),
+    ('approval ongoing', 'approval ongoing'),
+    ('approval complete', 'approval complete'),
+)

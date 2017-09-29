@@ -4,11 +4,13 @@ from django.contrib.auth.models import User
 
 
 class SenateSeedFund(models.Model):
+    created_by = models.OneToOneField(User, null=True, blank=True)
     activity_name = models.CharField(max_length=100)
     description = models.TextField(max_length=10000, null=True, blank=True)
     ssf = models.IntegerField(default=0)
-    council = models.CharField(max_length=20, choices=COUNCIL, null=True, blank=True)
-    entity = models.CharField(max_length=30, null=True, blank=True)
+    council = models.CharField(max_length=50, choices=COUNCIL, null=True, blank=True)
+    entity = models.CharField(max_length=50, null=True, blank=True)
+    status = models.CharField(max_length=50, choices=FORM_STATUS, default='in progress')
 
     def __str__(self):
         return self.activity_name
@@ -17,7 +19,7 @@ class SenateSeedFund(models.Model):
 class AdminPost(models.Model):
     post_name = models.CharField(max_length=50, null=True, blank=True)  # Will have choices
     post_holder = models.OneToOneField(User, null=True, blank=True)
-    council = models.CharField(max_length=20, choices=COUNCIL, null=True, blank=True)
+    council = models.CharField(max_length=50, choices=COUNCIL, null=True, blank=True)
 
     def __str__(self):
         return self.post_name
