@@ -1,0 +1,90 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+{% load bootstrap %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.7/cerulean/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-zF4BRsG/fLiTGfR9QL82DrilZxrwgY/+du4p/c7J72zZj+FLYq4zY00RylP9ZjiT" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'ssf/css/main.css' %}" type="text/css">
+
+    <title>{% block title %} Senator Seed Fund {% endblock %}</title>
+</head>
+<body>
+
+{% block navigation %}
+<nav class="navbar navbar-default" id="navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#">
+                <div>
+                    <img src="{% static 'ssf/img/gym.jpg' %}" width="50" height="50">
+                </div>
+            </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="{% url 'index' %} " id="brand">Senator Seed Fund</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li id="navbar-links"><a href="{% url 'login' %}">Login</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+
+<div class="container">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 profile-content">
+        {% if user.is_authenticated %}
+        <div style="padding-top:50px">
+            <h2 class="form-signin-heading text-center"><a href="{% url 'index' %}" >Welcome to the Portal</a></h2>
+            <br>
+            <br>
+            <a href="{% url 'logout' %}?next={% url 'login' %}" class="btn btn-md center-block btn-primary btn-block">Logout</a>
+        </div>
+        {% else %}
+
+           <form class="form-signin" method="post" action="{% url 'login' %}">
+               <h2 class="form-signin-heading">Login to Portal</h2>
+                {% csrf_token  %}
+                        {{form|bootstrap}}
+
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" value="remember-me"> Remember me
+                    </label>
+                </div>
+
+
+               <input class="btn btn-primary "type="submit" value="login" />
+               <input type="hidden" name="next" value="{{next}}">
+           </form>
+        {% endif %}
+    </div>
+    <div class="col-md-4"></div>
+</div> <!-- /container -->
+</body>
+</html>
+
+
+
+
+
+
+
