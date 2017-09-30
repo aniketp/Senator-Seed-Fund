@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <br><br>
+
+    <div>
+        <h2>Funds to be Approved</h2>
+    </div>
+
+    {% for ssf in ssf %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Name: {{ ssf.activity_name }}</h4>
+                <p>Max Amount: {{ ssf.ssf }}</p>
+                <p>Requested By: {{ ssf.created_by }}</p>
+
+                <a href="{% url 'start_ssf_funding' %}">
+                    <div class="btn btn-success">
+                        Start SSF
+                    </div>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

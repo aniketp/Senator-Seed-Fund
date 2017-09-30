@@ -9,8 +9,9 @@ from django.core.urlresolvers import reverse_lazy, reverse
 @login_required
 def index(request):
     ssf = SenateSeedFund.objects.filter(created_by=request.user)
+    opened_ssf = SenateSeedFund.objects.filter(status='approval complete')
 
-    return render(request, 'index.html', context={'ssf_forms': ssf})
+    return render(request, 'index.html', context={'ssf_forms': ssf, 'opened_ssf': opened_ssf})
 
 
 @login_required
@@ -144,8 +145,14 @@ def open_for_funding(request, pk):
 @login_required
 def open_ssf_list(request):
     funds = SenateSeedFund.objects.filter(status='approval ongoing')  # TODO : Check Deadline
+    senators = SenatePost.objects.all()
+    access = False
+    for senator in senators:
+        if request.user == senator.user:
+            access = True
+            return render(request, 'open_for_funding.html', context={'funds': funds, 'access': access})
 
-    return render(request, 'open_for_funding.html', context={'funds': funds})
+    return render(request, 'open_for_funding.html', context={'funds': funds, 'access': access})
 
 
 @login_required
@@ -179,7 +186,6 @@ def contribute_money(request, pk):   # Show only to Senators
     return render(request, 'open_for_funding.html', context={'form': form})
 
 # TODO : To specify who contributed what
-
 
 @login_required
 def force_closing(request, pk):            # visible only to chair or financial convener

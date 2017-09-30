@@ -3,7 +3,10 @@
 {% block content %}
     <br><br>
     <div>
-        <h2><a href="{% url 'ssf_create' %}">Create a New SSF</a></h2>
+        <a href="{% url 'ssf_create' %}"><h2>Create a New SSF</h2></a>
+    </div>
+    <div>
+        <a href="{% url 'open_ssf' %}"><h2>View Open SSF</h2></a>
     </div>
 
     <br>
@@ -20,12 +23,19 @@
                         <div>
                             <form action="{% url 'ssf_update' ssl.pk %}" method="get">
                                 <div>
-                                    <input type="submit" value="Submit">
+                                    <input type="submit" value="Edit">
                                 </div>
                             </form>
+                            <a href="{% url 'send_to_parent' %}">
+                                <div class="btn btn-primary">
+                                    Send To Your Council Head
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
     </div>
+
+    <br>
 {% endblock %}

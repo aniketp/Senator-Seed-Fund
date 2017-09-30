@@ -1,10 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block content %}
+    <br><br>
+
+    <div>
+        <h2>List Of Senators</h2>
+    </div>
+
+    <br>
+
+    <div>
+        <a href="{% url 'add_senator' %}"><h4>Add a senator</h4></a>
+    </div>
+
+
+    <!-- TODO: Create a dropdown for adding senators, or a new view altogether -->
+
+    {% for senator in senators %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Name: {{ senator.user.userprofile.name }}</h4>
+                <p>Batch: {{ senator.session }}</p>
+                <a href="{% url 'banish_senate' senator.pk %}">
+                    <div class="btn btn-danger">
+                        Remove
+                    </div>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

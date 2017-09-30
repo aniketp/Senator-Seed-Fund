@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br><br>
+
+    <div class="panel panel-default">
+        {% for ssf in funds %}
+            <div class="panel-body">
+                <h5>Name: {{ ssf.activity_name }}</h5>
+                <p>Max Amount: {{ ssf.ssf }}</p>
+                <p>Amount contributed by senators: {{ ssf.amount_given }}</p>
+
+                {% if access %}
+                    <a href="">
+                        <div class="btn btn-info">
+                            Contribute Money
+                        </div>
+                    </a>
+                {% endif %}
+
+                {% if request.user == 'financial_convener' or request.user == 'chairperson' %}
+                    <a href="{% url 'close_ssf' %}">
+                        <div class="btn btn-danger">
+                            Close SSF
+                        </div>
+                    </a>
+                {% endif %}
+
+
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

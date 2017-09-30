@@ -26,7 +26,7 @@ class SenateSeedFund(models.Model):
     chair_level = models.NullBooleanField(default=False, null=True)
     fin_convener = models.NullBooleanField(default=False, null=True)
     contributers = models.ManyToManyField(User, related_name='contributers', symmetrical=False, blank=True)
-    deadline = models.DateTimeField(default=datetime.now(), null=True)
+    deadline = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.activity_name
