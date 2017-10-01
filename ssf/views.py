@@ -146,44 +146,52 @@ def open_for_funding(request, pk):
 def open_ssf_list(request):
     funds = SenateSeedFund.objects.filter(released=True)  # TODO : Check Deadline
     senators = SenatePost.objects.all()
-    access = False
+    form = ContributeFundForm
+    sen_access = False
     for senator in senators:
         if request.user == senator.user:
-            access = True
-            return render(request, 'open_for_funding.html', context={'funds': funds, 'access': access})
+            sen_access = True
+            return render(request, 'open_for_funding.html', context={'funds': funds, 'access': sen_access,
+                                                                     'form': form})
 
-    return render(request, 'open_for_funding.html', context={'funds': funds, 'access': access})
+    return render(request, 'open_for_funding.html', context={'funds': funds, 'access': sen_access, 'form': form})
 
 
 @login_required
 def contribute_money(request, pk):   # Show only to Senators
+    funds = SenateSeedFund.objects.filter(released=True)
     ssf = SenateSeedFund.objects.get(pk=pk)
     senator = SenatePost.objects.get(user=request.user)
     form = ContributeFundForm
 
     if request.method == 'POST':
-        form = ContributeFundForm(request.POST)
+        form_ = ContributeFundForm(request.POST)
 
-        if form.is_valid():
+        if form_.is_valid():
             max_allowed = 0.33*senator.max_fund
-            contribution = form.cleaned_data['amount']
+            contribution = form_.cleaned_data['amount']
 
             if contribution > max_allowed:
                 message = "You're not allowed to contribute more than 1/3rd of your maximum fund"
-                return render(request, 'open_for_funding.html', context={'form': form, 'message': message})
+                return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
+                                                                         'funds': funds})
 
             elif ssf.amount_given + contribution > ssf.ssf:  # Exceeding maximum amount
                 message = "Cannot exceed maximum fund!!"
-                return render(request, 'open_for_funding.html', context={'form': form, 'message': message})
+                return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
+                                                                         'funds': funds})
 
             else:
                 ssf.amount_given += contribution
                 ssf.save()
+                senator.max_fund -= contribution
+                senator.save()
 
                 message = "Contribution successful"
-                return render(request, 'open_for_funding.html', context={'form': form, 'message': message})
+                return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
+                                                                         'funds': funds})
 
-    return render(request, 'open_for_funding.html', context={'form': form})
+    return render(request, 'open_for_funding.html', context={'form': form, 'funds': funds})
 
 # TODO : To specify who contributed what
 

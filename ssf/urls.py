@@ -33,4 +33,7 @@ urlpatterns = [
 
     # Send to Baap
     url(r'^send_to_parent/(?P<pk>\d+)/$', views.send_to_parent, name='send_to_parent'),
+
+    # Contribute Money
+    url(r'^contribute/(?P<pk>\d+)/$', views.contribute_money, name='contribute_money'),
 ]
