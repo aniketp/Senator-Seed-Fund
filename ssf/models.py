@@ -34,6 +34,15 @@ class SenateSeedFund(models.Model):
         return self.activity_name
 
 
+class Contribution(models.Model):
+    ssf = models.ForeignKey(SenateSeedFund, on_delete=models.CASCADE, null=True, blank=True)
+    contributer = models.OneToOneField(User, null=True, blank=True)
+    contribution = models.IntegerField()
+
+    def __str__(self):
+        return self.ssf
+
+
 class SenatePost(models.Model):
     user = models.OneToOneField(User, null=True, blank=True)
     session = models.CharField(max_length=10, choices=SESSION)

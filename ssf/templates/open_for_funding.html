@@ -4,6 +4,10 @@
 {% block content %}
     <br><br>
 
+    <div>
+        <h2>Open Senate Seed Funds</h2>
+    </div>
+
     <div class="panel panel-default">
         {% for ssf in funds %}
             <div class="panel-body">
@@ -11,24 +15,29 @@
                 <p>Max Amount: {{ ssf.ssf }}</p>
                 <p>Amount contributed by senators: {{ ssf.amount_given }}</p>
 
-                {% if True %}
+                {% if access %}
                     <form action="{% url 'contribute_money' ssf.pk %}" method="post">
                         {% csrf_token %}
                         {{ form|bootstrap }}
-                        <input class="btn btn-success" type="submit" value="Contribute">
+                        <input class="btn btn-success" type="submit" value="Contribute" style="display: inline-block">
                     </form>
                 {% endif %}
 
             <p>{{ message }}</p>
 
-                {% if request.user == 'financial_convener' or request.user == 'chairperson' %}
-                    <a href="{% url 'close_ssf' %}">
+                {% if chair or fin %}
+                    <a href="{% url 'close_ssf' ssf.pk %}">
                         <div class="btn btn-danger">
-                            Close SSF
+                            Force Close SSF
                         </div>
                     </a>
                 {% endif %}
 
+                <a href="#">
+                    <div class="btn btn-info btn-small">
+                        Show contributers
+                    </div>
+                </a>
 
             </div>
         {% endfor %}

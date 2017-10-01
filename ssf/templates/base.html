@@ -37,33 +37,6 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li><a href="{% url 'index' %}" id="brand">Senator Seed Fund</a></li>
-                <li><a href="" id="navbar-links">Profile</a></li>
-                {% block posts%}
-                    {% if my_posts %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" id="navbar-links" data-toggle="dropdown" role="button"
-                               aria-expanded="false">My Posts <span class="caret"></span></a>
-                            <ul class="dropdown-menu" role="menu">
-
-                                    {% for post in my_posts %}
-                                            <li><a href="" >{{post.post_name}}</a></li>
-                                    {% endfor %}
-
-                            </ul>
-                        </li>
-                    {% endif %}
-                    {% if interviews %}
-                        <li><a href="" id="navbar-links">Interviews</a></li>
-                    {% endif %}
-
-                    {% if senate %}
-                        <li><a href="" id="navbar-links">Ratifications</a></li>
-                        <li><a href="" id="navbar-links">All Nominations</a></li>
-                    {% endif %}
-                {% endblock %}
-                <li><a href="" id="navbar-links">Post Holders</a></li>
-
-
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li id="navbar-links"><a href="{% url 'logout' %}?next={% url 'login' %}">Logout</a></li>

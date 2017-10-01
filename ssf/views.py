@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 
 @login_required
 def index(request):
+    # my_profile = GeneralBodyMember.objects.get(user=request.user)
     ssf = SenateSeedFund.objects.filter(created_by=request.user)
     opened_ssf = SenateSeedFund.objects.filter(status='approval complete')
     approval_ssf = SenateSeedFund.objects.filter(approval__post_holder=request.user)
@@ -147,15 +148,33 @@ def open_ssf_list(request):
     funds = SenateSeedFund.objects.filter(released=True)  # TODO : Check Deadline
     senators = SenatePost.objects.all()
     form = ContributeFundForm
+
+    chairperson = False
+    if request.user == AdminPost.objects.get(pin=1).post_holder:
+        chairperson = True
+
+    fin_convener = False
+    if request.user == AdminPost.objects.get(pin=3).post_holder:
+        fin_convener = True
+
     sen_access = False
     for senator in senators:
         if request.user == senator.user:
             sen_access = True
             return render(request, 'open_for_funding.html', context={'funds': funds, 'access': sen_access,
-                                                                     'form': form})
+                                                                     'form': form, 'fin': fin_convener,
+                                                                     'chair': chairperson})
 
-    return render(request, 'open_for_funding.html', context={'funds': funds, 'access': sen_access, 'form': form})
+    return render(request, 'open_for_funding.html', context={'funds': funds, 'access': sen_access, 'form': form,
+                                                             'fin': fin_convener, 'chair': chairperson})
 
+
+@login_required
+def show_contributers(request, pk):
+    ssf = SenateSeedFund.objects.get(pk=pk)
+    donations = Contribution.objects.filter(ssf=ssf)
+
+    return True
 
 @login_required
 def contribute_money(request, pk):   # Show only to Senators
@@ -183,9 +202,17 @@ def contribute_money(request, pk):   # Show only to Senators
 
             else:
                 ssf.amount_given += contribution
+                ssf.contributers.add(senator.user)
                 ssf.save()
                 senator.max_fund -= contribution
                 senator.save()
+
+                Contribution.objects.create(ssf=ssf, contributer=senator.user, contribution=ssf.amount_given)
+
+                if ssf.ssf == ssf.amount_given:
+                    ssf.released = False
+                    ssf.fin_convener = True
+                    ssf.save()
 
                 message = "Contribution successful"
                 return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
@@ -204,4 +231,4 @@ def force_closing(request, pk):            # visible only to chair or financial 
     ssf.fin_convener = True
     ssf.save()
 
-    return HttpResponseRedirect('open_for_funding.html')
+    return HttpResponseRedirect(reverse('open_ssf'))

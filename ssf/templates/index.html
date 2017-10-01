@@ -7,12 +7,15 @@
         <div>
             <a href="{% url 'ssf_create' %}"><h2>Create a New SSF</h2></a>
         </div>
+    {% endif %}
+
 
     <div>
         <a href="{% url 'open_ssf' %}"><h2>View Open SSF</h2></a>
     </div>
 
     <br>
+    {% if gbm_user %}
         <div>
             <h2>Forms Created by You</h2>
 
@@ -81,5 +84,4 @@
         </div>
     {% endfor %}
 
-    <br>
 {% endblock %}

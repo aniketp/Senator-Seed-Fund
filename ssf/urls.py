@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'^open_ssf/$', views.open_ssf_list, name='open_ssf'),
 
     # Force closing
-    url(r'close_ssf/$', views.force_closing, name='close_ssf'),
+    url(r'close_ssf/(?P<pk>\d+)/$', views.force_closing, name='close_ssf'),
 
     # Open for funding
     url(r'^start_ssf_funding/(?P<pk>\d+)/$', views.open_for_funding, name='start_ssf_funding'),
