@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br><br>
+
+    <div>
+        <h2>Contributers for {{ ssf.activity_name }}</h2>
+    </div>
+
+    {% for donation in donations %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>Name: {{ donation.contributer }}</p>
+                <p>Contribution: {{ donation.contribution }}</p>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

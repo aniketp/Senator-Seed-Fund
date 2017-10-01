@@ -36,4 +36,7 @@ urlpatterns = [
 
     # Contribute Money
     url(r'^contribute/(?P<pk>\d+)/$', views.contribute_money, name='contribute_money'),
+
+    # Show Contributers
+    url(r'^contributers/(?P<pk>\d+)/$', views.show_contributers, name='show_contributers'),
 ]

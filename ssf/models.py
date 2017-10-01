@@ -36,11 +36,12 @@ class SenateSeedFund(models.Model):
 
 class Contribution(models.Model):
     ssf = models.ForeignKey(SenateSeedFund, on_delete=models.CASCADE, null=True, blank=True)
-    contributer = models.OneToOneField(User, null=True, blank=True)
+    date = models.DateTimeField(auto_now=True)
+    contributer = models.ForeignKey(User, null=True, blank=True)
     contribution = models.IntegerField()
 
     def __str__(self):
-        return self.ssf
+        return self.ssf.activity_name
 
 
 class SenatePost(models.Model):

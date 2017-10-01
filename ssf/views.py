@@ -10,10 +10,15 @@ from django.core.urlresolvers import reverse_lazy, reverse
 def index(request):
     # my_profile = GeneralBodyMember.objects.get(user=request.user)
     ssf = SenateSeedFund.objects.filter(created_by=request.user)
-    opened_ssf = SenateSeedFund.objects.filter(status='approval complete')
+    opened_ssf = SenateSeedFund.objects.filter(released=True)
     approval_ssf = SenateSeedFund.objects.filter(approval__post_holder=request.user)
     chair_ssf = SenateSeedFund.objects.filter(chair_level=True)
+    fin_level = SenateSeedFund.objects.filter(fin_convener=True)
     admins = AdminPost.objects.all()
+
+    chair = False
+    if request.user == AdminPost.objects.get(pin=1).post_holder:
+        chair = True
 
     gbm_user = True
     for admin in admins:
@@ -21,7 +26,8 @@ def index(request):
             gbm_user = False
 
     return render(request, 'index.html', context={'ssf_forms': ssf, 'opened_ssf': opened_ssf, 'chair_ssf': chair_ssf,
-                                                  'gbm_user': gbm_user, 'approvals': approval_ssf})
+                                                  'gbm_user': gbm_user, 'approvals': approval_ssf, 'fin': fin_level,
+                                                  'chair': chair})
 
 
 @login_required
@@ -174,7 +180,8 @@ def show_contributers(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
     donations = Contribution.objects.filter(ssf=ssf)
 
-    return True
+    return render(request, 'contributers.html', context={'ssf': ssf, 'donations': donations})
+
 
 @login_required
 def contribute_money(request, pk):   # Show only to Senators
@@ -203,11 +210,10 @@ def contribute_money(request, pk):   # Show only to Senators
             else:
                 ssf.amount_given += contribution
                 ssf.contributers.add(senator.user)
-                ssf.save()
+                Contribution.objects.create(ssf=ssf, contributer=senator.user, contribution=contribution)
                 senator.max_fund -= contribution
+                ssf.save()
                 senator.save()
-
-                Contribution.objects.create(ssf=ssf, contributer=senator.user, contribution=ssf.amount_given)
 
                 if ssf.ssf == ssf.amount_given:
                     ssf.released = False
@@ -215,8 +221,7 @@ def contribute_money(request, pk):   # Show only to Senators
                     ssf.save()
 
                 message = "Contribution successful"
-                return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
-                                                                         'funds': funds})
+                return HttpResponseRedirect(reverse('open_ssf'))
 
     return render(request, 'open_for_funding.html', context={'form': form, 'funds': funds})
 

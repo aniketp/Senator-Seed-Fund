@@ -41,7 +41,9 @@
                     </div>
                 {% endfor %}
         </div>
-    {% else %}
+    {% endif %}
+
+    <!-- Approval by the respective council head -->
 
     <div>
         <h2>SSFs requiring your approval</h2>
@@ -53,35 +55,40 @@
                 <p>Name: {{ ssf.activity_name }}</p>
                 <p>Created by: {{ ssf.created_by }}</p>
             </div>
-        <div>
-            <a href="{% url 'send_to_chair' ssf.pk %}">
-                <div class="btn btn-warning">
-                    Send to Chair
-                </div>
-            </a>
-        </div>
-        </div>
-    {% endfor %}
-
-    {% endif %}
-
-
-    {% for ssf in chair_ssf %}
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <p>Name: {{ ssf.activity_name }}</p>
-                <p>Requested By: {{ ssf.created_by }}</p>
-                <p>Council: {{ ssf.council }}</p>
-                <div>
-                    <a href="{% url 'start_ssf_funding' ssf.pk %}">
-                        <div class="btn btn-warning">
-                            Approve
-                        </div>
-                    </a>
-                </div>
+            <div>
+                <a href="{% url 'send_to_chair' ssf.pk %}">
+                    <div class="btn btn-warning">
+                        Send to Chair
+                    </div>
+                </a>
             </div>
-
         </div>
     {% endfor %}
+
+    <!-- Chairperson Approval -->
+
+    {% if chair %}
+        <div>
+            <h2>Final Approval By Chairperson</h2>
+        </div>
+
+        {% for ssf in chair_ssf %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>Name: {{ ssf.activity_name }}</p>
+                    <p>Requested By: {{ ssf.created_by }}</p>
+                    <p>Council: {{ ssf.council }}</p>
+                    <div>
+                        <a href="{% url 'start_ssf_funding' ssf.pk %}">
+                            <div class="btn btn-warning">
+                                Approve
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        {% endfor %}
+    {% endif %}
 
 {% endblock %}
