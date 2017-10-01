@@ -187,10 +187,13 @@ def contribute_money(request, pk):   # Show only to Senators
 
 # TODO : To specify who contributed what
 
+
 @login_required
 def force_closing(request, pk):            # visible only to chair or financial convener
     ssf = SenateSeedFund.objects.get(pk=pk)
     ssf.status = 'approval completed'
+    ssf.released = False
+    ssf.fin_convener = True
     ssf.save()
 
     return HttpResponseRedirect('open_for_funding.html')

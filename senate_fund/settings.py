@@ -57,6 +57,11 @@ TEMPLATES = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = (
+    'ssf.backends.MyCustomBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
 WSGI_APPLICATION = 'senate_fund.wsgi.application'
 
 AUTH_PROFILE_MODULE = 'ssf.GeneralBodyMember'
