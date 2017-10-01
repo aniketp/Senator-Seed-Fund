@@ -11,9 +11,9 @@ class SenateSeedFundForm(forms.Form):
 
 
 class AddSenatorForm(forms.Form):
-    username = forms.CharField(help_text='Please exclude "@iitk.ac.in"')
+    roll_no = forms.IntegerField()
     session = forms.ChoiceField(choices=SESSION, widget=forms.Select)
-    max_fund = forms.IntegerField(label='Grant', max_value=10000)
+    max_fund = forms.IntegerField(label='Grant', max_value=20000)
 
 
 class ContributeFundForm(forms.Form):

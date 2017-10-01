@@ -2,40 +2,84 @@
 
 {% block content %}
     <br><br>
-    <div>
-        <a href="{% url 'ssf_create' %}"><h2>Create a New SSF</h2></a>
-    </div>
+
+    {% if gbm_user %}
+        <div>
+            <a href="{% url 'ssf_create' %}"><h2>Create a New SSF</h2></a>
+        </div>
+
     <div>
         <a href="{% url 'open_ssf' %}"><h2>View Open SSF</h2></a>
     </div>
 
     <br>
+        <div>
+            <h2>Forms Created by You</h2>
 
-    <div>
-        <h2>Forms Created by You</h2>
 
-
-            {% for ssl in ssf_forms %}
-                <div class="container">
-                    <div class="row">
-                        <p>Name: {{ ssl.activity_name }}</p>
-                        <p>Status: {{ ssl.status }}</p>
-                        <div>
-                            <form action="{% url 'ssf_update' ssl.pk %}" method="get">
-                                <div>
-                                    <input type="submit" value="Edit">
-                                </div>
-                            </form>
-                            <a href="{% url 'send_to_parent' %}">
-                                <div class="btn btn-primary">
-                                    Send To Your Council Head
-                                </div>
-                            </a>
+                {% for ssf in ssf_forms %}
+                    <div class="container">
+                        <div class="row">
+                            <p>Name: {{ ssf.activity_name }}</p>
+                            <p>Status: {{ ssf.status }}</p>
+                            <div>
+                                <form action="{% url 'ssf_update' ssf.pk %}" method="get">
+                                    <div>
+                                        <input type="submit" value="Edit">
+                                    </div>
+                                </form>
+                                <a href="{% url 'send_to_parent' ssf.pk %}">
+                                    <div class="btn btn-primary">
+                                        Send To Your Council Head
+                                    </div>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+        </div>
+    {% else %}
+
+    <div>
+        <h2>SSFs requiring your approval</h2>
     </div>
+
+    {% for ssf in approvals %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>Name: {{ ssf.activity_name }}</p>
+                <p>Created by: {{ ssf.created_by }}</p>
+            </div>
+        <div>
+            <a href="{% url 'send_to_chair' ssf.pk %}">
+                <div class="btn btn-warning">
+                    Send to Chair
+                </div>
+            </a>
+        </div>
+        </div>
+    {% endfor %}
+
+    {% endif %}
+
+
+    {% for ssf in chair_ssf %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>Name: {{ ssf.activity_name }}</p>
+                <p>Requested By: {{ ssf.created_by }}</p>
+                <p>Council: {{ ssf.council }}</p>
+                <div>
+                    <a href="{% url 'start_ssf_funding' ssf.pk %}">
+                        <div class="btn btn-warning">
+                            Approve
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    {% endfor %}
 
     <br>
 {% endblock %}

@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .forms import *
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import UpdateView, DeleteView
 from django.core.urlresolvers import reverse_lazy, reverse
 
 
@@ -10,24 +10,46 @@ from django.core.urlresolvers import reverse_lazy, reverse
 def index(request):
     ssf = SenateSeedFund.objects.filter(created_by=request.user)
     opened_ssf = SenateSeedFund.objects.filter(status='approval complete')
+    approval_ssf = SenateSeedFund.objects.filter(approval__post_holder=request.user)
+    chair_ssf = SenateSeedFund.objects.filter(chair_level=True)
+    admins = AdminPost.objects.all()
 
-    return render(request, 'index.html', context={'ssf_forms': ssf, 'opened_ssf': opened_ssf})
+    gbm_user = True
+    for admin in admins:
+        if request.user == admin.post_holder:
+            gbm_user = False
+
+    return render(request, 'index.html', context={'ssf_forms': ssf, 'opened_ssf': opened_ssf, 'chair_ssf': chair_ssf,
+                                                  'gbm_user': gbm_user, 'approvals': approval_ssf})
 
 
 @login_required
 def senator_list(request):
     senators = SenatePost.objects.all()
-    chair = AdminPost.objects.get(post_holder='chairperson').post_holder
+    chair = AdminPost.objects.get(pin=1).post_holder
+    form = AddSenatorForm
     if request.user == chair:
-        return render(request, 'senators.html', context={'senators': senators})
+        if request.method == 'POST':
+            form = AddSenatorForm(request.POST)
+
+            if form.is_valid():
+                roll = form.cleaned_data['roll_no']
+                member = GeneralBodyMember.objects.get(roll_no=roll).user
+                SenatePost.objects.create(user=member,
+                                          session=form.cleaned_data['session'],
+                                          max_fund=form.cleaned_data['max_fund'])
+
+            return HttpResponseRedirect(reverse('senatorlist'))
+
+        return render(request, 'senators.html', context={'senators': senators, 'form': form})
 
     else:
-        return HttpResponseRedirect('no_access.html')
+        return render(request, 'no_access.html')
 
 
 @login_required
 def add_senator(request):
-    chair = AdminPost.objects.get(post_holder='chairperson').post_holder
+    chair = AdminPost.objects.get(pin=1).post_holder
     if request.user == chair:
         if request.method == 'POST':
             form = AddSenatorForm(request.POST)
@@ -40,12 +62,12 @@ def add_senator(request):
             return HttpResponseRedirect(reverse('senatorlist'))
 
     else:
-        return HttpResponseRedirect('no_access.html')
+        return render(request, 'no_access.html')
 
 
 class SenatePostDelete(DeleteView):
     model = SenatePost
-    success_url = reverse_lazy('senator_list')
+    success_url = reverse_lazy('senatorlist')
 
 
 @login_required
@@ -79,11 +101,11 @@ class SenateSeedFundUpdate(UpdateView):
 def send_to_parent(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
     council = ssf.council
-    chair = AdminPost.objects.get(post_holder='chairperson')
-    psg = AdminPost.objects.get(post_holder='president')
-    snt = AdminPost.objects.get(post_holder='sntsecy')
-    cult = AdminPost.objects.get(post_holder='cultsecy')
-    sports = AdminPost.objects.get(post_holder='sportssecy')
+    chair = AdminPost.objects.get(pin=1)                    # Chairperson
+    psg = AdminPost.objects.get(pin=2)                      # President
+    snt = AdminPost.objects.get(pin=4)                      # SnTSecy
+    cult = AdminPost.objects.get(pin=5)                     # Cultsecy
+    sports = AdminPost.objects.get(pin=6)                   # Sportssecy
 
     if council == 'Science & Technology Council':
         ssf.approval.add(snt)
@@ -100,51 +122,29 @@ def send_to_parent(request, pk):
 
 
 @login_required
-def show_admin_approvals(request):
-    senate_funds = SenateSeedFund.objects.all()
-
-    ssf_lists = []
-    for fund in senate_funds:
-        if request.user in fund.approval:
-            ssf_lists.append(fund)
-
-    return render(request, 'admin_approval_lists.html', context={'ssf_lists': ssf_lists})
-
-
-@login_required
 def send_to_chair(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
     ssf.chair_level = True
     ssf.approval.clear()
     ssf.save()
 
-    return HttpResponseRedirect(reverse('admin_approvals'))
-
-
-@login_required
-def show_chair_approvals(request):
-    chair = AdminPost.objects.get(post_holder='chairperson').post_holder
-    if request.user == chair:
-        ssf = SenateSeedFund.objects.filter(chair_level=True)
-
-        return render(request, 'chair_approval_list.html', context={'ssf': ssf})
-
-    else:
-        return HttpResponseRedirect('no_access.html')
+    return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def open_for_funding(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
     ssf.status = 'approval ongoing'
+    ssf.chair_level = False
+    ssf.released = True
     ssf.save()
 
-    return HttpResponseRedirect(reverse('chair_approvals'))
+    return HttpResponseRedirect(reverse('index'))
 
 
 @login_required
 def open_ssf_list(request):
-    funds = SenateSeedFund.objects.filter(status='approval ongoing')  # TODO : Check Deadline
+    funds = SenateSeedFund.objects.filter(released=True)  # TODO : Check Deadline
     senators = SenatePost.objects.all()
     access = False
     for senator in senators:

@@ -7,6 +7,7 @@ from datetime import datetime
 class AdminPost(models.Model):
     post_name = models.CharField(max_length=50, null=True, blank=True)  # Will have choices
     post_holder = models.OneToOneField(User, null=True, blank=True)
+    pin = models.IntegerField(null=True, blank=True, unique=True)
     council = models.CharField(max_length=50, choices=COUNCIL, null=True, blank=True)
 
     def __str__(self):
@@ -14,7 +15,7 @@ class AdminPost(models.Model):
 
 
 class SenateSeedFund(models.Model):
-    created_by = models.OneToOneField(User, null=True, blank=True)
+    created_by = models.ForeignKey(User, null=True, blank=True)
     activity_name = models.CharField(max_length=100)
     description = models.TextField(max_length=10000, null=True, blank=True)
     ssf = models.IntegerField(default=0)
@@ -24,6 +25,7 @@ class SenateSeedFund(models.Model):
     status = models.CharField(max_length=50, choices=FORM_STATUS, default='in progress')
     approval = models.ManyToManyField(AdminPost, related_name='approvals', symmetrical=False, blank=True)
     chair_level = models.NullBooleanField(default=False, null=True)
+    released = models.NullBooleanField(default=False, null=True)
     fin_convener = models.NullBooleanField(default=False, null=True)
     contributers = models.ManyToManyField(User, related_name='contributers', symmetrical=False, blank=True)
     deadline = models.DateTimeField(null=True)
@@ -38,7 +40,7 @@ class SenatePost(models.Model):
     max_fund = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.user
+        return self.user.username
 
 
 class GeneralBodyMember(models.Model):
