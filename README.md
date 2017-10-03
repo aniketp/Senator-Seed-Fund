@@ -13,8 +13,11 @@ Navigate to the folder <br>
 Install the required dependencies <br>
 ` pip install -r requirements.txt `
 
-Migrate the inbuilt SQlite database
-` python3 manage.py migrate && python3 manage.py makemigrations `
+Prepare the migration scripts <br>
+` python3 manage.py makemigrations `
+
+Migrate to Django's inbuilt database Sqlite <br>
+` python3 manage.py makemigrations `
 
 Run the localhost-server <br>
 ` python3 manage.py runserver `
