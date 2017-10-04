@@ -254,3 +254,15 @@ def force_closing(request, pk):            # visible only to chair or financial 
     ssf.save()
 
     return HttpResponseRedirect(reverse('open_ssf'))
+
+
+@login_required
+def reject_ssf(request, pk):
+    ssf = SenateSeedFund.objects.get(pk=pk)
+    ssf.status = 'in progress'
+    ssf.chair_level = False
+    ssf.fin_convener = False
+    ssf.released = False
+    ssf.save()
+
+    return HttpResponseRedirect(reverse('index'))
