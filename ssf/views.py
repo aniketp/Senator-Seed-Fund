@@ -245,8 +245,9 @@ def contribute_money(request, pk):   # Show only to Senators
     return render(request, 'open_for_funding.html', context={'form': form, 'funds': funds})
 
 
+# visible only to chair or financial convener
 @login_required
-def force_closing(request, pk):            # visible only to chair or financial convener
+def force_closing(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
     ssf.status = 'approval completed'
     ssf.released = False
@@ -256,6 +257,8 @@ def force_closing(request, pk):            # visible only to chair or financial 
     return HttpResponseRedirect(reverse('open_ssf'))
 
 
+# Rejection by anyone other than financial convener
+# For fin convener ask Kunal
 @login_required
 def reject_ssf(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
