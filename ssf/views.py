@@ -9,25 +9,43 @@ from django.core.urlresolvers import reverse_lazy, reverse
 @login_required
 def index(request):
     # my_profile = GeneralBodyMember.objects.get(user=request.user)
-    ssf = SenateSeedFund.objects.filter(created_by=request.user)
+    ssf = SenateSeedFund.objects.filter(created_by=request.user).filter(status='in progress')
     opened_ssf = SenateSeedFund.objects.filter(released=True)
     approval_ssf = SenateSeedFund.objects.filter(approval__post_holder=request.user)
     chair_ssf = SenateSeedFund.objects.filter(chair_level=True)
     fin_level = SenateSeedFund.objects.filter(fin_convener=True)
     admins = AdminPost.objects.all()
+    senators = SenatePost.objects.all()
+
+    ssf_viewer = False
+    for senator in senators:
+        if request.user == senator.user:
+            ssf_viewer = True
+            break
+
+    if request.user == AdminPost.objects.get(pin=3).post_holder:
+        ssf_viewer = True                               # Financial Convener
 
     chair = False
     if request.user == AdminPost.objects.get(pin=1).post_holder:
         chair = True
+        ssf_viewer = True
 
     gbm_user = True
     for admin in admins:
         if request.user == admin.post_holder:
             gbm_user = False
 
+    secies = AdminPost.objects.all().exclude(pin=3)  # Exclude financial convener
+
+    secy_access = False
+    for secy in secies:
+        if request.user == secy.post_holder:
+            secy_access = True
+
     return render(request, 'index.html', context={'ssf_forms': ssf, 'opened_ssf': opened_ssf, 'chair_ssf': chair_ssf,
                                                   'gbm_user': gbm_user, 'approvals': approval_ssf, 'fin': fin_level,
-                                                  'chair': chair})
+                                                  'chair': chair, 'secies': secy_access, 'ssf_viewer': ssf_viewer})
 
 
 @login_required
@@ -125,6 +143,8 @@ def send_to_parent(request, pk):
     elif council == 'President Student Gymkhana':
         ssf.approval.add(psg)
 
+    ssf.status = 'sent to parent'
+    ssf.save()
     return HttpResponseRedirect(reverse('index'))
 
 
@@ -220,12 +240,9 @@ def contribute_money(request, pk):   # Show only to Senators
                     ssf.fin_convener = True
                     ssf.save()
 
-                message = "Contribution successful"
-                return HttpResponseRedirect(reverse('open_ssf'))
+                return HttpResponseRedirect(reverse('index'))
 
     return render(request, 'open_for_funding.html', context={'form': form, 'funds': funds})
-
-# TODO : To specify who contributed what
 
 
 @login_required

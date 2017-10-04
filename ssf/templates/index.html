@@ -9,10 +9,11 @@
         </div>
     {% endif %}
 
-
-    <div>
-        <a href="{% url 'open_ssf' %}"><h2>View Open SSF</h2></a>
-    </div>
+    {% if ssf_viewer %}
+        <div>
+            <a href="{% url 'open_ssf' %}"><h2>View Open SSF</h2></a>
+        </div>
+    {% endif %}
 
     <br>
     {% if gbm_user %}
@@ -45,25 +46,27 @@
 
     <!-- Approval by the respective council head -->
 
-    <div>
-        <h2>SSFs requiring your approval</h2>
-    </div>
-
-    {% for ssf in approvals %}
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <p>Name: {{ ssf.activity_name }}</p>
-                <p>Created by: {{ ssf.created_by }}</p>
-            </div>
-            <div>
-                <a href="{% url 'send_to_chair' ssf.pk %}">
-                    <div class="btn btn-warning">
-                        Send to Chair
-                    </div>
-                </a>
-            </div>
+    {% if secies %}
+        <div>
+            <h2>SSFs requiring your approval</h2>
         </div>
-    {% endfor %}
+
+        {% for ssf in approvals %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <p>Name: {{ ssf.activity_name }}</p>
+                    <p>Created by: {{ ssf.created_by }}</p>
+                </div>
+                <div>
+                    <a href="{% url 'send_to_chair' ssf.pk %}">
+                        <div class="btn btn-warning">
+                            Send to Chair
+                        </div>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
 
     <!-- Chairperson Approval -->
 

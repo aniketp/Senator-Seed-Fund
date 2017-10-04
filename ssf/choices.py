@@ -65,6 +65,7 @@ COUNCIL = (
 
 FORM_STATUS = (
     ('in progress', 'in progress'),
-    ('approval ongoing', 'approval ongoing'),
+    ('sent to parent', 'sent to parent'),
+    ('sent to chair', 'sent to chair'),
     ('approval complete', 'approval complete'),
 )

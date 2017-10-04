@@ -11,7 +11,7 @@ class SSFAdmin(admin.ModelAdmin):
 
 
 class AdminPostAdmin(admin.ModelAdmin):
-    list_display = ('post_name', 'post_holder', 'council')
+    list_display = ('post_name', 'pin', 'post_holder', 'council')
 
 
 class SenatorPostAdmin(admin.ModelAdmin):
