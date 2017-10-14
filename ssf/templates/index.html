@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bootstrap %}
 
 {% block content %}
     <br><br>
@@ -37,7 +38,12 @@
                                 </div>
 
                                 <div class="panel-body">
-                                    <p>Status: {{ ssf.status }}</p>
+                                    {% if ssf.rejected %}
+                                        <p>Status: Rejected</p>
+                                        <p>Rejection Message: {{ ssf.reject_message }}</p>
+                                    {% else %}
+                                        <p>Status: {{ ssf.status }}</p>
+                                    {% endif %}
                                     <div>
                                         <form action="{% url 'ssf_update' ssf.pk %}" method="get"
                                               style="display: inline-block">
@@ -145,9 +151,24 @@
                     <div>
                         <a href="{% url 'start_ssf_funding' ssf.pk %}">
                             <div class="btn btn-success">
-                                Approve
+                                Approve SSF
                             </div>
                         </a>
+
+                        <div class="btn-group">
+                            <button class="btn btn-secondary btn-danger dropdown-toggle" style="width: auto" type="button"
+                            id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                 Reject SSF
+                                <i class="fa fa-caret-down  fa-lg" aria-hidden="true"></i>
+                            </button>
+                             <div class="dropdown-menu " role="menu">
+                                 <form action="{% url 'reject_ssf' ssf.pk %}" method="post" style="display: inline">
+                                     {% csrf_token %}
+                                     <p>{{form|bootstrap}}</p>
+                                     <input class="btn btn-success btn-block" type="submit" value="submit" />
+                                 </form>
+                             </div>
+                        </div>
                     </div>
                 </div>
 

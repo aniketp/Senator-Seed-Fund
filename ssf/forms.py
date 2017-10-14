@@ -18,3 +18,7 @@ class AddSenatorForm(forms.Form):
 
 class ContributeFundForm(forms.Form):
     amount = forms.IntegerField(max_value=10000)
+
+
+class RejectForm(forms.Form):
+    message = forms.CharField(widget=forms.Textarea)

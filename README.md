@@ -17,7 +17,7 @@ Prepare the migration scripts <br>
 ` python3 manage.py makemigrations `
 
 Migrate to Django's inbuilt database Sqlite <br>
-` python3 manage.py makemigrations `
+` python3 manage.py migrate `
 
 Run the localhost-server <br>
 ` python3 manage.py runserver `

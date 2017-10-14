@@ -30,6 +30,9 @@ class SenateSeedFund(models.Model):
     contributers = models.ManyToManyField(User, related_name='contributers', symmetrical=False, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
 
+    rejected = models.NullBooleanField(default=False, null=True)
+    reject_message = models.TextField(max_length=2000, null=True, blank=True)
+
     def __str__(self):
         return self.activity_name
 

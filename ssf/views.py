@@ -16,6 +16,7 @@ def index(request):
     fin_level = SenateSeedFund.objects.filter(fin_convener=True)
     admins = AdminPost.objects.all()
     senators = SenatePost.objects.all()
+    reject_form = RejectForm()
 
     ssf_viewer = False
     for senator in senators:
@@ -45,7 +46,8 @@ def index(request):
 
     return render(request, 'index.html', context={'ssf_forms': ssf, 'opened_ssf': opened_ssf, 'chair_ssf': chair_ssf,
                                                   'gbm_user': gbm_user, 'approvals': approval_ssf, 'fin': fin_level,
-                                                  'chair': chair, 'secies': secy_access, 'ssf_viewer': ssf_viewer})
+                                                  'chair': chair, 'secies': secy_access, 'ssf_viewer': ssf_viewer,
+                                                  'form': reject_form})
 
 
 @login_required
@@ -144,6 +146,7 @@ def send_to_parent(request, pk):
         ssf.approval.add(psg)
 
     ssf.status = 'sent to parent'
+    ssf.rejected = False
     ssf.save()
     return HttpResponseRedirect(reverse('index'))
 
@@ -304,11 +307,18 @@ def force_closing(request, pk):
 # For fin convener ask Kunal
 @login_required
 def reject_ssf(request, pk):
-    ssf = SenateSeedFund.objects.get(pk=pk)
-    ssf.status = 'in progress'
-    ssf.chair_level = False
-    ssf.fin_convener = False
-    ssf.released = False
-    ssf.save()
+    if request.method == 'POST':
+        form = RejectForm(request.POST)
+
+        if form.is_valid():
+            ssf = SenateSeedFund.objects.get(pk=pk)
+            message = form.cleaned_data['message']
+            ssf.rejected = True
+            ssf.reject_message = message
+            ssf.status = 'in progress'
+            ssf.chair_level = False
+            ssf.fin_convener = False
+            ssf.released = False
+            ssf.save()
 
     return HttpResponseRedirect(reverse('index'))

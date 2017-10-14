@@ -45,4 +45,7 @@ urlpatterns = [
 
     # Show Contributers
     url(r'^contributers/(?P<pk>\d+)/$', views.show_contributers, name='show_contributers'),
+
+    # Reject SSF
+    url(r'reject_ssf/(?P<pk>\d+)/$', views.reject_ssf, name='reject_ssf'),
 ]
