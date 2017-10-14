@@ -4,15 +4,22 @@
     <br><br>
 
     {% if gbm_user %}
-        <div>
-            <a href="{% url 'ssf_create' %}"><h2>Create a New SSF</h2></a>
-        </div>
+
+        <a href="{% url 'ssf_create' %}">
+            <div class="btn btn-primary">
+                Create a New SSF
+            </div>
+        </a>
     {% endif %}
 
     {% if ssf_viewer %}
-        <div>
-            <a href="{% url 'open_ssf' %}"><h2>View Open SSF</h2></a>
-        </div>
+
+        <a href="{% url 'open_ssf' %}">
+            <div class="btn btn-warning">
+                View Open SSF
+            </div>
+        </a>
+
     {% endif %}
 
     <br>
@@ -21,26 +28,52 @@
             <h2>Forms Created by You</h2>
 
 
-                {% for ssf in ssf_forms %}
-                    <div class="container">
+                <div class="">
+                    {% for ssf in ssf_forms %}
                         <div class="row">
-                            <p>Name: {{ ssf.activity_name }}</p>
-                            <p>Status: {{ ssf.status }}</p>
-                            <div>
-                                <form action="{% url 'ssf_update' ssf.pk %}" method="get">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <p>Name: {{ ssf.activity_name }}</p>
+                                </div>
+
+                                <div class="panel-body">
+                                    <p>Status: {{ ssf.status }}</p>
                                     <div>
-                                        <input type="submit" value="Edit">
+                                        <form action="{% url 'ssf_update' ssf.pk %}" method="get"
+                                              style="display: inline-block">
+                                            <div>
+                                                <input type="submit" class="btn btn-success" value="Edit SSF">
+                                            </div>
+                                        </form>
+
+                                        <div style="display: inline-block">
+                                            {% if ssf.status == 'in progress' %}
+                                                <a href="{% url 'send_to_parent' ssf.pk %}">
+                                                    <div class="btn btn-primary">
+                                                        Send To Council Head
+                                                    </div>
+                                                </a>
+                                            {% elif ssf.status == 'sent to parent' %}
+                                                <a href="{% url 'cancel_request' ssf.pk %}">
+                                                    <div class="btn btn-warning">
+                                                        Cancel Request
+                                                    </div>
+                                                </a>
+                                            {% else %}
+                                                <div class="btn btn-danger disabled">
+                                                    Accepted by Council Head
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
                                     </div>
-                                </form>
-                                <a href="{% url 'send_to_parent' ssf.pk %}">
-                                    <div class="btn btn-primary">
-                                        Send To Your Council Head
-                                    </div>
-                                </a>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
+
         </div>
     {% endif %}
 
@@ -52,17 +85,41 @@
         </div>
 
         {% for ssf in approvals %}
-            <div class="panel panel-default">
-                <div class="panel-body">
+            <div class="panel panel-success">
+                <div class="panel-heading">
                     <p>Name: {{ ssf.activity_name }}</p>
+                </div>
+                <div class="panel-body">
+                    <p>Status: {{ ssf.status }}</p>
                     <p>Created by: {{ ssf.created_by }}</p>
                 </div>
                 <div>
-                    <a href="{% url 'send_to_chair' ssf.pk %}">
-                        <div class="btn btn-warning">
-                            Send to Chair
+                    <form action="{% url 'ssf_update' ssf.pk %}" method="get"
+                          style="display: inline-block">
+                        <div>
+                            <input type="submit" class="btn btn-success" value="Edit SSF">
                         </div>
-                    </a>
+                    </form>
+
+                    <div style="display: inline-block">
+                        {% if ssf.status == 'sent to parent' %}
+                            <a href="{% url 'send_to_chair' ssf.pk %}">
+                                <div class="btn btn-primary">
+                                    Send to Chair
+                                </div>
+                            </a>
+                        {% elif ssf.status == 'sent to chair' %}
+                            <a href="{% url 'cancel_chair_request' ssf.pk %}">
+                                <div class="btn btn-warning">
+                                    Cancel Request
+                                </div>
+                            </a>
+                        {% else %}
+                            <div class="btn btn-danger disabled">
+                                Open for Funding
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         {% endfor %}
@@ -76,14 +133,18 @@
         </div>
 
         {% for ssf in chair_ssf %}
-            <div class="panel panel-default">
-                <div class="panel-body">
+            <div class="panel panel-info">
+
+                <div class="panel-heading">
                     <p>Name: {{ ssf.activity_name }}</p>
+                </div>
+
+                <div class="panel-body">
                     <p>Requested By: {{ ssf.created_by }}</p>
                     <p>Council: {{ ssf.council }}</p>
                     <div>
                         <a href="{% url 'start_ssf_funding' ssf.pk %}">
-                            <div class="btn btn-warning">
+                            <div class="btn btn-success">
                                 Approve
                             </div>
                         </a>

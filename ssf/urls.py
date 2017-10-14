@@ -28,11 +28,17 @@ urlpatterns = [
     # Send to Kunal
     url(r'^send_to_chair/(?P<pk>\d+)/$', views.send_to_chair, name='send_to_chair'),
 
+    # Take back from Kunal
+    url(r'^cancel_chair_request/(?P<pk>\d+)/$', views.cancel_chair_request, name='cancel_chair_request'),
+
     # Add senators
     url(r'^add_senator/$', views.add_senator, name='add_senator'),
 
     # Send to Baap
     url(r'^send_to_parent/(?P<pk>\d+)/$', views.send_to_parent, name='send_to_parent'),
+
+    # Cancel request
+    url(r'^cancel_request/(?P<pk>\d+)/$', views.cancel_request, name='cancel_request'),
 
     # Contribute Money
     url(r'^contribute/(?P<pk>\d+)/$', views.contribute_money, name='contribute_money'),

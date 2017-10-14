@@ -67,5 +67,6 @@ FORM_STATUS = (
     ('in progress', 'in progress'),
     ('sent to parent', 'sent to parent'),
     ('sent to chair', 'sent to chair'),
+    ('open for funding', 'open for funding'),
     ('approval complete', 'approval complete'),
 )

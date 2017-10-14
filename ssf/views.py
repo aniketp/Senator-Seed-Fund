@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse_lazy, reverse
 @login_required
 def index(request):
     # my_profile = GeneralBodyMember.objects.get(user=request.user)
-    ssf = SenateSeedFund.objects.filter(created_by=request.user).filter(status='in progress')
+    ssf = SenateSeedFund.objects.filter(created_by=request.user)
     opened_ssf = SenateSeedFund.objects.filter(released=True)
     approval_ssf = SenateSeedFund.objects.filter(approval__post_holder=request.user)
     chair_ssf = SenateSeedFund.objects.filter(chair_level=True)
@@ -149,11 +149,54 @@ def send_to_parent(request, pk):
 
 
 @login_required
+def cancel_request(request, pk):
+    ssf = SenateSeedFund.objects.get(pk=pk)
+
+    if not ssf.chair_level:
+        ssf.approval.clear()
+        ssf.status = 'in progress'
+        ssf.save()
+
+    return HttpResponseRedirect(reverse('index'))
+
+
+@login_required
 def send_to_chair(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
     ssf.chair_level = True
-    ssf.approval.clear()
+    ssf.status = 'sent to chair'
     ssf.save()
+
+    return HttpResponseRedirect(reverse('index'))
+
+
+@login_required
+def cancel_chair_request(request, pk):
+    ssf = SenateSeedFund.objects.get(pk=pk)
+
+    if not ssf.status == 'open for funding':
+
+        council = ssf.council
+        chair = AdminPost.objects.get(pin=1)  # Chairperson
+        psg = AdminPost.objects.get(pin=2)  # President
+        snt = AdminPost.objects.get(pin=4)  # SnTSecy
+        cult = AdminPost.objects.get(pin=5)  # Cultsecy
+        sports = AdminPost.objects.get(pin=6)  # Sportssecy
+
+        if council == 'Science & Technology Council':
+            ssf.approval.add(snt)
+        elif council == 'Films and Cultural Council':
+            ssf.approval.add(cult)
+        elif council == 'Sports Council':
+            ssf.approval.add(sports)
+        elif council == "Chairperson Students' Senate":
+            ssf.approval.add(chair)
+        elif council == 'President Student Gymkhana':
+            ssf.approval.add(psg)
+
+        ssf.chair_level = False
+        ssf.status = 'sent to parent'
+        ssf.save()
 
     return HttpResponseRedirect(reverse('index'))
 
@@ -161,7 +204,7 @@ def send_to_chair(request, pk):
 @login_required
 def open_for_funding(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
-    ssf.status = 'approval ongoing'
+    ssf.status = 'open for funding'
     ssf.chair_level = False
     ssf.released = True
     ssf.save()
