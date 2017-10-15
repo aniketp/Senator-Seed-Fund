@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load bootstrap %}
+
+{% block content %}
+    <div>
+        <h2>Final Approval By Financial Convener</h2>
+    </div>
+
+    {% for ssf in ssf %}
+        <div class="panel panel-info">
+
+            <div class="panel-heading">
+                <p>Name: {{ ssf.activity_name }}</p>
+            </div>
+
+            <div class="panel-body">
+                <p>Requested By: {{ ssf.created_by }}</p>
+                <p>Council: {{ ssf.council }}</p>
+                <div>
+                    <a href="{% url 'accept_by_fin' ssf.pk %}">
+                        <div class="btn btn-success">
+                            Approve SSF
+                        </div>
+                    </a>
+
+                    <div class="btn-group">
+                        <button class="btn btn-secondary btn-danger dropdown-toggle" style="width: auto" type="button"
+                        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                             Reject SSF
+                            <i class="fa fa-caret-down  fa-lg" aria-hidden="true"></i>
+                        </button>
+                         <div class="dropdown-menu " role="menu">
+                             <form action="{% url 'reject_by_fin' ssf.pk %}" method="post" style="display: inline">
+                                 {% csrf_token %}
+                                 <p>{{form|bootstrap}}</p>
+                                 <input class="btn btn-success btn-block" type="submit" value="submit" />
+                             </form>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    {% endfor %}
+{% endblock %}

@@ -283,6 +283,7 @@ def contribute_money(request, pk):   # Show only to Senators
 
                 if ssf.ssf == ssf.amount_given:
                     ssf.released = False
+                    ssf.status = 'ssf closed'
                     ssf.fin_convener = True
                     ssf.save()
 
@@ -295,12 +296,50 @@ def contribute_money(request, pk):   # Show only to Senators
 @login_required
 def force_closing(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
-    ssf.status = 'approval completed'
+    ssf.status = 'ssf closed'
     ssf.released = False
     ssf.fin_convener = True
     ssf.save()
 
     return HttpResponseRedirect(reverse('open_ssf'))
+
+
+@login_required
+def final_approval_list(request):
+    closed_ssf = SenateSeedFund.objects.get(fin_convener=True)
+    form = RejectForm()
+    
+    return render(request, 'final_approval_list.html', context={'ssf': closed_ssf, 'form': form})
+
+
+# TODO: Amount donated is currently pledged, convert it to status and change it accordingly in the views
+@login_required
+def approval_by_fin(request, pk):
+    ssf = SenateSeedFund.objects.get(pk=pk)
+    ssf.status = 'approval complete'
+    ssf.fin_convener = False
+    ssf.save()
+
+    return HttpResponseRedirect(reverse('final_approval_list'))
+
+
+@login_required
+def reject_by_fin(request, pk):
+    if request.method == 'POST':
+        form = RejectForm(request.POST)
+
+        if form.is_valid():
+            ssf = SenateSeedFund.objects.get(pk=pk)
+            message = form.cleaned_data['message']
+            ssf.rejected = True
+            ssf.reject_message = message
+            ssf.status = 'in progress'
+            ssf.chair_level = False
+            ssf.fin_convener = False
+            ssf.released = False
+            ssf.save()
+
+    return HttpResponseRedirect(reverse('final_approval_list'))
 
 
 # Rejection by anyone other than financial convener
