@@ -31,9 +31,6 @@ urlpatterns = [
     # Take back from Kunal
     url(r'^cancel-chair-request/(?P<pk>\d+)/$', views.cancel_chair_request, name='cancel_chair_request'),
 
-    # Add senators
-    url(r'^add-senator/$', views.add_senator, name='add_senator'),
-
     # Send to Baap
     url(r'^send-to-parent/(?P<pk>\d+)/$', views.send_to_parent, name='send_to_parent'),
 

@@ -62,31 +62,14 @@ def senator_list(request):
             if form.is_valid():
                 roll = form.cleaned_data['roll_no']
                 member = GeneralBodyMember.objects.get(roll_no=roll).user
-                SenatePost.objects.create(user=member,
-                                          session=form.cleaned_data['session'],
-                                          max_fund=form.cleaned_data['max_fund'])
+                max_fund = form.cleaned_data['max_fund']
+
+                fund = SenatorFund.objects.create(senator=member, max_amount=max_fund)
+                SenatePost.objects.create(user=member, session=form.cleaned_data['session'], max_fund=fund)
 
             return HttpResponseRedirect(reverse('senatorlist'))
 
         return render(request, 'senators.html', context={'senators': senators, 'form': form})
-
-    else:
-        return render(request, 'no_access.html')
-
-
-@login_required
-def add_senator(request):
-    chair = AdminPost.objects.get(pin=1).post_holder
-    if request.user == chair:
-        if request.method == 'POST':
-            form = AddSenatorForm(request.POST)
-
-            if form.is_valid():
-                SenatePost.objects.create(user=form.cleaned_data['username'],
-                                          session=form.cleaned_data['session'],
-                                          max_fund=form.cleaned_data['max_fund'])
-
-            return HttpResponseRedirect(reverse('senatorlist'))
 
     else:
         return render(request, 'no_access.html')
@@ -121,6 +104,11 @@ def ssf_form(request):
 class SenateSeedFundUpdate(UpdateView):
     model = SenateSeedFund
     fields = ['activity_name', 'description', 'ssf', 'council', 'entity']
+    success_url = reverse_lazy('index')
+
+
+class SenateSeedFundDelete(DeleteView):
+    model = SenateSeedFund
     success_url = reverse_lazy('index')
 
 
@@ -249,6 +237,11 @@ def show_contributers(request, pk):
     return render(request, 'contributers.html', context={'ssf': ssf, 'donations': donations})
 
 
+NOT_ENOUGH_FUND = "You don't have that much fund left"
+MAX_EXCEED_MESSAGE = "Cannot exceed maximum fund!!"
+ONE_THIRD_MESSAGE = "You're not allowed to contribute more than 1/3rd of your maximum fund"
+
+
 @login_required
 def contribute_money(request, pk):   # Show only to Senators
     funds = SenateSeedFund.objects.filter(released=True)
@@ -260,16 +253,24 @@ def contribute_money(request, pk):   # Show only to Senators
         form_ = ContributeFundForm(request.POST)
 
         if form_.is_valid():
-            max_allowed = 0.33*senator.max_fund
+            max_allowed = 0.33*senator.fund.max_amount
             contribution = form_.cleaned_data['amount']
 
-            if contribution > max_allowed:
-                message = "You're not allowed to contribute more than 1/3rd of your maximum fund"
+            # Not enough fund left with the senator
+            if contribution > senator.fund.amount_left:
+                message = NOT_ENOUGH_FUND
                 return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
                                                                          'funds': funds})
 
-            elif ssf.amount_given + contribution > ssf.ssf:  # Exceeding maximum amount
-                message = "Cannot exceed maximum fund!!"
+            # Contribution more than one-third of maximum amount
+            elif contribution > max_allowed:
+                message = ONE_THIRD_MESSAGE
+                return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
+                                                                         'funds': funds})
+
+            # Exceeding maximum amount possible
+            elif ssf.amount_given + contribution > ssf.ssf:
+                message = MAX_EXCEED_MESSAGE
                 return render(request, 'open_for_funding.html', context={'form': form, 'message': message,
                                                                          'funds': funds})
 
@@ -277,7 +278,9 @@ def contribute_money(request, pk):   # Show only to Senators
                 ssf.amount_given += contribution
                 ssf.contributers.add(senator.user)
                 Contribution.objects.create(ssf=ssf, contributer=senator.user, contribution=contribution)
-                senator.max_fund -= contribution
+                senator.fund.amount_left -= contribution
+                senator.fund.pledged += contribution
+
                 ssf.save()
                 senator.save()
 
@@ -312,7 +315,6 @@ def final_approval_list(request):
     return render(request, 'final_approval_list.html', context={'ssf': closed_ssf, 'form': form})
 
 
-# TODO: Amount donated is currently pledged, convert it to status and change it accordingly in the views
 @login_required
 def approval_by_fin(request, pk):
     ssf = SenateSeedFund.objects.get(pk=pk)
@@ -320,9 +322,16 @@ def approval_by_fin(request, pk):
     ssf.fin_convener = False
     ssf.save()
 
+    contributers = ssf.contributers.all()
+    for contributer in contributers:
+        senator = SenatePost.objects.get(user=contributer)
+        senator.fund.pledged = 0
+        senator.save()
+
     return HttpResponseRedirect(reverse('final_approval_list'))
 
 
+# TODO: Rigourous testing of code (Lots of stuff is happening in this function)
 @login_required
 def reject_by_fin(request, pk):
     if request.method == 'POST':
@@ -331,6 +340,20 @@ def reject_by_fin(request, pk):
         if form.is_valid():
             ssf = SenateSeedFund.objects.get(pk=pk)
             message = form.cleaned_data['message']
+
+            contributers = ssf.contributers.all()
+            for contributer in contributers:
+
+                # All contributions by a particular senator
+                contributions = Contribution.objects.filter(contributer=contributer, ssf=ssf)
+                money = 0
+                for contrib in contributions:
+                    money += contrib.contribution
+
+                senator = SenatePost.objects.get(user=contributer)
+                senator.fund.pledged = 0
+                senator.fund.amount_left += money
+
             ssf.rejected = True
             ssf.reject_message = message
             ssf.status = 'in progress'

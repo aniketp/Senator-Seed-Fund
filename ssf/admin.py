@@ -15,7 +15,11 @@ class AdminPostAdmin(admin.ModelAdmin):
 
 
 class SenatorPostAdmin(admin.ModelAdmin):
-    list_display = ('user', 'session', 'max_fund')
+    list_display = ('user', 'session')
+
+
+class SenatorFundAdmin(admin.ModelAdmin):
+    list_display = ('senator', 'max_amount', 'pledged', 'amount_left')
 
 
 class ContributerAdmin(admin.ModelAdmin):
@@ -26,4 +30,5 @@ admin.site.register(GeneralBodyMember, GBMAdmin)
 admin.site.register(SenateSeedFund, SSFAdmin)
 admin.site.register(AdminPost, AdminPostAdmin)
 admin.site.register(SenatePost, SenatorPostAdmin)
+admin.site.register(SenatorFund, SenatorFundAdmin)
 admin.site.register(Contribution, ContributerAdmin)

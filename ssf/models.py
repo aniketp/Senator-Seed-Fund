@@ -37,6 +37,16 @@ class SenateSeedFund(models.Model):
         return self.activity_name
 
 
+class SenatorFund(models.Model):
+    senator = models.OneToOneField(User, null=True, blank=True)
+    max_amount = models.IntegerField(null=True, blank=True)
+    pledged = models.IntegerField(default=0, null=True, blank=True)
+    amount_left = models.IntegerField(default=max_amount, null=True, blank=True)
+
+    def __str__(self):
+        return str(self.max_amount)
+
+
 class Contribution(models.Model):
     ssf = models.ForeignKey(SenateSeedFund, on_delete=models.CASCADE, null=True, blank=True)
     date = models.DateTimeField(auto_now=True)
@@ -50,7 +60,7 @@ class Contribution(models.Model):
 class SenatePost(models.Model):
     user = models.OneToOneField(User, null=True, blank=True)
     session = models.CharField(max_length=10, choices=SESSION)
-    max_fund = models.IntegerField(default=0)
+    fund = models.OneToOneField(SenatorFund, null=True, blank=True)
 
     def __str__(self):
         return self.user.username
