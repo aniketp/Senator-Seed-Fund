@@ -353,6 +353,7 @@ def reject_by_fin(request, pk):
                 senator = SenatePost.objects.get(user=contributer)
                 senator.fund.pledged = 0
                 senator.fund.amount_left += money
+                senator.save()
 
             ssf.rejected = True
             ssf.reject_message = message
@@ -366,7 +367,6 @@ def reject_by_fin(request, pk):
 
 
 # Rejection by anyone other than financial convener
-# For fin convener ask Kunal
 @login_required
 def reject_ssf(request, pk):
     if request.method == 'POST':
@@ -384,3 +384,48 @@ def reject_ssf(request, pk):
             ssf.save()
 
     return HttpResponseRedirect(reverse('index'))
+
+
+MAX_REDUCE_MESSAGE = "You cannot reduce more than total pledged amount"
+SUCCESS_REDUCE = "SSF Amount reduced successfully"
+
+
+# TODO: Testing !! And feature to inform the senators
+# Proportionately reduce the amount from each senator
+@login_required
+def reduce_money(request, pk):
+    ssf = SenateSeedFund.objects.get(pk=pk)
+    form = AmountReduceForm
+
+    if request.method == 'POST':
+        form_ = AmountReduceForm(request.POST)
+
+        if form_.is_valid():
+            amount = form_.cleaned_data['amount']
+
+            if amount > ssf.amount_given:
+                message = MAX_REDUCE_MESSAGE
+                return render(request, 'final_approval_list.html', context={'form': form, 'message': message,
+                                                                            'ssf': ssf})
+            else:
+                contributers = ssf.contributers.all()
+                for contributer in contributers:
+                    senator = SenatePost.objects.get(user=contributer)
+
+                    contributions = Contribution.objects.filter(contributer=contributer, ssf=ssf)
+                    money = 0
+                    for contrib in contributions:
+                        money += contrib.contribution
+
+                    # Calculation of reduction of each senator
+                    each_reduce = (money * int(amount/ssf.amount_given)) + 1
+                    senator.fund.pledged -= each_reduce
+                    senator.fund.amount_left += each_reduce
+                    senator.save()
+
+            ssf.amount_given -= amount
+            message = SUCCESS_REDUCE
+            return render(request, 'final_approval_list.html', context={'form': form, 'message': message,
+                                                                        'ssf': ssf})
+
+    return render(request, 'final_approval_list.html', context={'form': form, 'ssf': ssf})

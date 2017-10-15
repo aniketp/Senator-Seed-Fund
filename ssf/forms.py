@@ -22,3 +22,7 @@ class ContributeFundForm(forms.Form):
 
 class RejectForm(forms.Form):
     message = forms.CharField(widget=forms.Textarea)
+
+
+class AmountReduceForm(forms.Form):
+    amount = forms.IntegerField()
